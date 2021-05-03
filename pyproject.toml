@@ -8,6 +8,8 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.8"
 Django = "^3.2"
+psycopg2-binary = "^2.8.6"
+djangorestframework = "^3.12.4"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.4b2", allow-prereleases = true}

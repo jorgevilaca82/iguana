@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
+from iguana.base.models.mixins import Timestamps
 
 
-class User(AbstractUser):
+class User(Timestamps, AbstractUser):
     pass
