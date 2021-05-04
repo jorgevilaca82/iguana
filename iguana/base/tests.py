@@ -1,7 +1,11 @@
-from django.utils.timezone import datetime
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
+from django.db.models.query import QuerySet
 from django.test import TestCase
+from django.utils.timezone import datetime
+from iguana.base.models.endereco import Endereco
 from iguana.base.models.pessoa_fisica import PessoaFisica
+from iguana.base.models.telefone import Telefone
 from iguana.base.models.user import User
 
 
@@ -27,22 +31,60 @@ class UserTests(TestCase):
 
 
 class PessoaFisicaModelTests(TestCase):
+    def setUp(self) -> None:
+        self.pf1 = PessoaFisica.objects.create_user(
+            username="jose", email="jose@iguana.com", password="jose", cpf="81662104286"
+        )
+        return super().setUp()
+
     def test_save_new(self):
-        pf = PessoaFisica()
+        pf = PessoaFisica(cpf="47571343208")
         self.assertIsNone(pf.pk)
         pf.save()
         self.assertIsNotNone(pf.pk)
 
-    def test_timestamps(self):
-        pf = PessoaFisica.objects.create(username="jose")
-        self.assertIsInstance(pf, PessoaFisica)
-        self.assertIsInstance(pf.created_at, datetime)
-        self.assertIsInstance(pf.updated_at, datetime)
+    def test_is_user(self):
+        self.assertIsInstance(self.pf1, User)
 
-        old_update_at = pf.updated_at
-        old_created_at = pf.created_at
-        pf.email = "jose@iguana.com"
-        pf.save()
-        self.assertNotEquals(pf.updated_at, old_update_at)
-        self.assertGreater(pf.updated_at, old_update_at)
-        self.assertEquals(pf.created_at, old_created_at)
+    def test_timestamps(self):
+        self.assertIsInstance(self.pf1, PessoaFisica)
+        self.assertIsInstance(self.pf1.created_at, datetime)
+        self.assertIsInstance(self.pf1.updated_at, datetime)
+
+        old_update_at = self.pf1.updated_at
+        old_created_at = self.pf1.created_at
+        self.pf1.email = "jose@iguana.com"
+        self.pf1.save()
+        self.assertNotEquals(self.pf1.updated_at, old_update_at)
+        self.assertGreater(self.pf1.updated_at, old_update_at)
+        self.assertEquals(self.pf1.created_at, old_created_at)
+
+    def test_pode_validar_cpf(self):
+        pf = PessoaFisica(cpf="81662104285")  # cpf inválido
+        with self.assertRaises(ValidationError) as cm:  # cm: Context Manager
+            pf.full_clean()
+
+        self.assertIn("cpf", cm.exception.error_dict)
+
+    def test_tem_relacionamento_com_endereco(self):
+        enderecos = self.pf1.base_endereco_related.all()
+        self.assertIsInstance(enderecos, QuerySet)
+        novo_endereco = self.pf1.base_endereco_related.create(principal=True)
+        self.assertIsInstance(novo_endereco, Endereco)
+        self.assertEquals(novo_endereco.user.pessoafisica, self.pf1)
+
+        self.assertIs(novo_endereco.principal, True)
+        # cria um novo endereco principal
+        novo_endereco_principal = self.pf1.base_endereco_related.create(principal=True)
+        self.assertIs(novo_endereco_principal.principal, True)
+
+        # o primeiro endereço deixa de ser o principal automaticamente
+        novo_endereco.refresh_from_db()
+        self.assertIs(novo_endereco.principal, False)
+
+    def test_tem_relacionamento_com_telefone(self):
+        telefones = self.pf1.base_telefone_related.all()
+        self.assertIsInstance(telefones, QuerySet)
+        novo_telefone = self.pf1.base_telefone_related.create()
+        self.assertIsInstance(novo_telefone, Telefone)
+        self.assertEquals(novo_telefone.user.pessoafisica, self.pf1)
