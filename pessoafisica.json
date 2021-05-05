@@ -1,0 +1,13 @@
+[
+    {
+        "model": "base.pessoafisica",
+        "pk": 8,
+        "fields": {
+            "cpf": "81662104286",
+            "sexo": null,
+            "estado_civil": null,
+            "tipo_sanguineo": null,
+            "falecido": false
+        }
+    }
+]

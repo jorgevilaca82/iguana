@@ -69,13 +69,17 @@ class PessoaFisicaModelTests(TestCase):
     def test_tem_relacionamento_com_endereco(self):
         enderecos = self.pf1.base_endereco_related.all()
         self.assertIsInstance(enderecos, QuerySet)
-        novo_endereco = self.pf1.base_endereco_related.create(principal=True)
+        novo_endereco = self.pf1.base_endereco_related.create(
+            principal=True, tipo=Endereco.Tipo.RESIDENCIAL
+        )
         self.assertIsInstance(novo_endereco, Endereco)
         self.assertEquals(novo_endereco.user.pessoafisica, self.pf1)
 
         self.assertIs(novo_endereco.principal, True)
         # cria um novo endereco principal
-        novo_endereco_principal = self.pf1.base_endereco_related.create(principal=True)
+        novo_endereco_principal = self.pf1.base_endereco_related.create(
+            principal=True, tipo=Endereco.Tipo.RESIDENCIAL
+        )
         self.assertIs(novo_endereco_principal.principal, True)
 
         # o primeiro endereço deixa de ser o principal automaticamente
@@ -88,3 +92,18 @@ class PessoaFisicaModelTests(TestCase):
         novo_telefone = self.pf1.base_telefone_related.create()
         self.assertIsInstance(novo_telefone, Telefone)
         self.assertEquals(novo_telefone.user.pessoafisica, self.pf1)
+
+
+class PessoaFisicaWebApiTests(TestCase):
+    fixtures = ("user.json", "pessoafisica.json")
+
+    def setUp(self) -> None:
+        return super().setUp()
+
+    def test_get_list(self):
+        response = self.client.get(
+            "/api/pessoafisica.json", HTTP_ACCEPT="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNot(len(response.json()["results"]), 0)
+        self.assertGreaterEqual(response.json()["count"], 2)

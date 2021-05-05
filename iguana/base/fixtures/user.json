@@ -1,0 +1,42 @@
+[
+    {
+        "model": "base.user",
+        "pk": 8,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$X1SZTHEJvPlkbnSpHLknis$MAKJ+hihEqDfKlbifrIHZKp8Ey7Ho4OWHeghURucOn0=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "jose1",
+            "first_name": "",
+            "last_name": "",
+            "email": "jose@iguana.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-05-04T13:13:19.198Z",
+            "created_at": "2021-05-04T13:13:19.313Z",
+            "updated_at": "2021-05-04T13:13:19.313Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "base.user",
+        "pk": 9,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "",
+            "first_name": "Francisco",
+            "last_name": "Ferreira da Silva",
+            "email": "",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-05-05T19:34:00.853Z",
+            "created_at": "2021-05-05T19:36:11.622Z",
+            "updated_at": "2021-05-05T19:36:11.622Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

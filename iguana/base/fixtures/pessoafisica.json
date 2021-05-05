@@ -1,0 +1,24 @@
+[
+    {
+        "model": "base.pessoafisica",
+        "pk": 8,
+        "fields": {
+            "cpf": "81662104286",
+            "sexo": null,
+            "estado_civil": null,
+            "tipo_sanguineo": null,
+            "falecido": false
+        }
+    },
+    {
+        "model": "base.pessoafisica",
+        "pk": 9,
+        "fields": {
+            "cpf": "985.899.470-25",
+            "sexo": "M",
+            "estado_civil": 2,
+            "tipo_sanguineo": "O-",
+            "falecido": false
+        }
+    }
+]

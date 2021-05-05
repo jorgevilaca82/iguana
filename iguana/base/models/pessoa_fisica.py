@@ -5,6 +5,9 @@ from localflavor.br.models import BRCPFField
 
 
 class PessoaFisica(User):
+    class Meta:
+        ordering = ["-pk"]
+
     class Genero(models.TextChoices):
         MASCULINO = "M", _("Masculino")
         FEMININO = "F", _("Feminino")
