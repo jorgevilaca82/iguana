@@ -50,3 +50,7 @@ class PessoaFisica(User):
         splited = value.split()
         self.first_name = splited[0]
         self.last_name = " ".join(splited[1:])
+
+    def save(self, *args, **kwargs) -> None:
+        self.username = self.username or self.cpf
+        return super().save(*args, **kwargs)

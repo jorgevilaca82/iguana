@@ -7,6 +7,8 @@ from iguana.base.models.endereco import Endereco
 from iguana.base.models.pessoa_fisica import PessoaFisica
 from iguana.base.models.telefone import Telefone
 from iguana.base.models.user import User
+from rest_framework import status
+from rest_framework.test import APIClient
 
 
 class UserTests(TestCase):
@@ -98,12 +100,30 @@ class PessoaFisicaWebApiTests(TestCase):
     fixtures = ("user.json", "pessoafisica.json")
 
     def setUp(self) -> None:
+        self.client = APIClient()
+        self.client.login(username="iguana_user", password="iguana")
         return super().setUp()
 
     def test_get_list(self):
         response = self.client.get(
             "/api/pessoafisica.json", HTTP_ACCEPT="application/json"
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNot(len(response.json()["results"]), 0)
         self.assertGreaterEqual(response.json()["count"], 2)
+
+    def test_create(self):
+        response = self.client.post(
+            "/api/pessoafisica.json",
+            data=dict(
+                nomecompleto="Jose da Silva",
+                cpf="47571343208",
+                estado_civil=PessoaFisica.EstadoCivil.SOLTEIRO,
+                sexo=PessoaFisica.Genero.MASCULINO,
+                tipo_sanguineo=PessoaFisica.TipoSanguineo.O_POSITIVO,
+            ),
+            content_type="application/json",
+        )
+        print(response)
+        self.assertTrue(status.is_success(response.status_code))
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
