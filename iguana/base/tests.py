@@ -1,14 +1,17 @@
+import json
+
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 from django.test import TestCase
+from django.urls import reverse_lazy
 from django.utils.timezone import datetime
 from iguana.base.models.endereco import Endereco
 from iguana.base.models.pessoa_fisica import PessoaFisica
 from iguana.base.models.telefone import Telefone
 from iguana.base.models.user import User
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 
 
 class UserTests(TestCase):
@@ -96,34 +99,41 @@ class PessoaFisicaModelTests(TestCase):
         self.assertEquals(novo_telefone.user.pessoafisica, self.pf1)
 
 
-class PessoaFisicaWebApiTests(TestCase):
+class PessoaFisicaWebApiTests(APITestCase):
     fixtures = ("user.json", "pessoafisica.json")
 
+    JSON_CONTENT_TYPE = "application/json"
+
     def setUp(self) -> None:
-        self.client = APIClient()
-        self.client.login(username="iguana_user", password="iguana")
+        # self.client = APIClient()
+        # self.client.login(username="iguana_user", password="iguana")
+
+        self.pf_list_path = reverse_lazy("pessoafisica-list")
+        self.pf_detail_path = reverse_lazy("pessoafisica-detail")
+
         return super().setUp()
 
     def test_get_list(self):
-        response = self.client.get(
-            "/api/pessoafisica.json", HTTP_ACCEPT="application/json"
-        )
+        response = self.client.get(self.pf_list_path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNot(len(response.json()["results"]), 0)
         self.assertGreaterEqual(response.json()["count"], 2)
 
     def test_create(self):
-        response = self.client.post(
-            "/api/pessoafisica.json",
-            data=dict(
-                nomecompleto="Jose da Silva",
-                cpf="47571343208",
-                estado_civil=PessoaFisica.EstadoCivil.SOLTEIRO,
-                sexo=PessoaFisica.Genero.MASCULINO,
-                tipo_sanguineo=PessoaFisica.TipoSanguineo.O_POSITIVO,
-            ),
-            content_type="application/json",
+        # user = User.objects.first()
+        # self.client.force_authenticate(user=user)
+        valid_payload = dict(
+            nome_completo="Jose da Silva",
+            email="jose@gmail.com",
+            cpf="47571343208",
+            estado_civil=PessoaFisica.EstadoCivil.SOLTEIRO,
+            sexo=PessoaFisica.Genero.MASCULINO,
+            tipo_sanguineo=PessoaFisica.TipoSanguineo.O_POSITIVO,
         )
-        print(response)
-        self.assertTrue(status.is_success(response.status_code))
+        response = self.client.post(
+            self.pf_list_path,
+            data=json.dumps(valid_payload),
+            content_type=self.JSON_CONTENT_TYPE,
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(status.is_success(response.status_code))

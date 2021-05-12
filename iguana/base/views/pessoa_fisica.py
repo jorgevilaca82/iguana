@@ -1,9 +1,8 @@
 from iguana.base.models.pessoa_fisica import PessoaFisica
-from rest_framework import generics as g
-from rest_framework import serializers as s
+from rest_framework import fields, generics, serializers
 
 
-class PessoaFisicaSerializer(s.ModelSerializer):
+class PessoaFisicaModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = PessoaFisica
         fields = [
@@ -16,19 +15,23 @@ class PessoaFisicaSerializer(s.ModelSerializer):
             "falecido",
         ]
 
-    nome_completo = s.CharField(max_length=255)
-    email = s.CharField(max_length=254)
-    sexo = s.CharField(max_length=1)
+    nome_completo = fields.CharField(max_length=255)
+    email = fields.EmailField(max_length=254)
+    sexo = fields.CharField(max_length=1)
 
 
-class PessoaFisicaMixin:
+class PessoaFisicaAPIViewMixin:
     queryset = PessoaFisica.objects.all()
-    serializer_class = PessoaFisicaSerializer
+    serializer_class = PessoaFisicaModelSerializer
 
 
-class PessoaFisicaList(PessoaFisicaMixin, g.ListCreateAPIView):
+class PessoaFisicaListCreateAPIView(
+    PessoaFisicaAPIViewMixin, generics.ListCreateAPIView
+):
     pass
 
 
-class PessoaFisicaDetail(g.RetrieveUpdateDestroyAPIView):
+class PessoaFisicaRetrieveUpdateDestroyAPIView(
+    PessoaFisicaAPIViewMixin, generics.RetrieveUpdateDestroyAPIView
+):
     pass
