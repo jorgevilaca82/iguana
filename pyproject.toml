@@ -11,6 +11,7 @@ Django = "^3.2"
 psycopg2-binary = "^2.8.6"
 djangorestframework = "^3.12.4"
 django-localflavor = "^3.0.1"
+djangorestframework-simplejwt = "^4.6.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^21.4b2", allow-prereleases = true}

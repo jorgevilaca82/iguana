@@ -54,3 +54,28 @@ class PessoaFisica(User):
     def save(self, *args, **kwargs) -> None:
         self.username = self.username or self.cpf
         return super().save(*args, **kwargs)
+
+
+class DocumentoIdentificacao(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["pessoa_fisica_id", "tipo"],
+                name="unique_pessoa_fisica_id_tipo",
+            )
+        ]
+
+    class Tipo(models.TextChoices):
+        RG = "RG", _("RG")
+        CTPS = "CTPS", _("Cateira de Trabalho - CTPS")
+        CNH = "CNH", _("Carteira Nacional de Habilitação - CNH")
+        TITULO_ELEITOR = "TITULO_ELEITOR", _("Título de Eleitor")
+        PASSAPORTE = "PASSAPORTE", _("Passaporte")
+        RESERVISTA = "RESERV", _("Certificado de Reservista")
+        CERTIDAO_NASCIMENTO = "CERT_NASC", _("Certidão de Nascimento")
+
+    tipo = models.CharField(_("Tipo"), max_length=50, choices=Tipo.choices)
+
+    pessoa_fisica = models.ForeignKey(
+        "base.PessoaFisica", verbose_name=_("Pessoa Física"), on_delete=models.CASCADE
+    )
