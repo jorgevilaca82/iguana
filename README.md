@@ -1,5 +1,7 @@
 # Iguana
 
+Iguana é um projeto de uma API Rest base usando Django forncendo funcionalidades para casos comuns de cadastros em sistemas de informação no Brasil.
+
 ## Executando o ambiente de desenvolvimento
 
 ### Depedências

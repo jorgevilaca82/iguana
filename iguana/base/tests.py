@@ -36,17 +36,29 @@ class UserTests(TestCase):
 
 
 class PessoaFisicaModelTests(TestCase):
+    CPF_VALIDO = "47571343208"
+    CPF_INVALIDO = "81662104285"
+
     def setUp(self) -> None:
+
         self.pf1 = PessoaFisica.objects.create_user(
             username="jose", email="jose@iguana.com", password="jose", cpf="81662104286"
         )
         return super().setUp()
 
     def test_save_new(self):
-        pf = PessoaFisica(cpf="47571343208")
+        """
+        O minimo necessário para salvar uma pessoa fisica é o cpf.
+        Isso é interessante em casos de importação onde nem todos os dados
+        estão disponíveis. Por isso mantemos no model somente validações críticas
+        """
+        pf = PessoaFisica(cpf=self.CPF_VALIDO)
         self.assertIsNone(pf.pk)
         pf.save()
         self.assertIsNotNone(pf.pk)
+        self.assertIs(pf.documentoidentificacao_set.count(), 0)
+        self.assertIs(pf.base_telefone_related.count(), 0)
+        self.assertIs(pf.base_endereco_related.count(), 0)
 
     def test_is_user(self):
         self.assertIsInstance(self.pf1, User)
@@ -65,7 +77,7 @@ class PessoaFisicaModelTests(TestCase):
         self.assertEquals(self.pf1.created_at, old_created_at)
 
     def test_pode_validar_cpf(self):
-        pf = PessoaFisica(cpf="81662104285")  # cpf inválido
+        pf = PessoaFisica(cpf=self.CPF_INVALIDO)
         with self.assertRaises(ValidationError) as cm:  # cm: Context Manager
             pf.full_clean()
 
@@ -135,5 +147,6 @@ class PessoaFisicaWebApiTests(APITestCase):
             data=json.dumps(valid_payload),
             content_type=self.JSON_CONTENT_TYPE,
         )
+        # print(json.dumps(valid_payload))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(status.is_success(response.status_code))
