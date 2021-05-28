@@ -1,0 +1,18 @@
+[
+    {
+        "model": "base.pais",
+        "pk": 1,
+        "fields": {
+            "sigla": "BR",
+            "nome": "Brasil"
+        }
+    },
+    {
+        "model": "base.pais",
+        "pk": 2,
+        "fields": {
+            "sigla": "US",
+            "nome": "Estados Unidos da América"
+        }
+    }
+]
